@@ -23,21 +23,24 @@ class agent:
                         if 0 <= nx < size and 0 <= ny < size:
                             if self.board[nx][ny] == player:
                                 continue
-                            if self.board[nx][ny] == '.':
+                            elif self.board[nx][ny] == '.':
                                 pass
                             else:
                                 close += 1
-
+                        else:
+                            close += 1
                         for d in range(1, 4):
                             nx, ny = x + d * dx, y + d * dy
                             if 0 <= nx < size and 0 <= ny < size:
                                 if self.board[nx][ny] == player:
                                     count += 1
-                                if self.board[nx][ny] == '.':
-                                    pass
+                                elif self.board[nx][ny] == '.':
+                                    break
                                 else:
                                     close += 1
+                                    break
                             else:
+                                close += 1
                                 break
                         point = 0
                         if close == 2:
@@ -47,9 +50,10 @@ class agent:
                         elif count == 3 and close == 0:
                             point = 4000
                         elif count == 2 and close == 1:
-                            point = 100
+                            point = 10
                         elif count == 2 and close == 0:
                             point = 1000
+
 
                         if player == self.ai_player:
                             score += point
@@ -207,10 +211,12 @@ class agent:
             self._undo_move(x, y)
 
             if score > best_score:
+                print(f"New best move: {(x, y)} with score {score} (previous best: {best_score})")
                 best_score = score
                 move_to_make = (x, y)
                 best_local = local
             elif score == best_score and local > best_local:
+                print(f"Tie in score {score}, but new move {(x, y)} has better local evaluation {local} (previous local: {best_local})")
                 move_to_make = (x, y)
                 best_local = local
 

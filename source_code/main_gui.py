@@ -3,7 +3,7 @@ from caro_ai.ai.minimax_lv2 import agent
 from gui import CaroGUI
 
 def main():
-    ai = agent(depth=3)
+    ai = agent(depth=4)
     CaroGUI(
         game_factory=lambda: Game_Caro(9),
         ai_agent=ai,
