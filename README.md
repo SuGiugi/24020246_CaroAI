@@ -71,15 +71,15 @@ ai = agent(depth=2)
 
 ```
 caro-ai/
-├── main_gui.py              # Điểm khởi chạy chương trình
-├── gui.py                   # Giao diện đồ họa Tkinter
-├── benchmark_weights.py     # Công cụ đánh giá trọng số AI
-├── pytest.ini               # Cấu hình pytest
+├── main_gui.py              
+├── gui.py                   
+├── benchmark_weights.py     
+├── pytest.ini               
 ├── caro_ai/
-│   ├── logic.py             # Logic game (bàn cờ, thắng/thua/hòa)
+│   ├── logic.py             
 │   └── ai/
-│       └── minimax_lv2.py   # AI agent (Minimax + Alpha-Beta)
+│       └── minimax_lv2.py   
 └── tests/
-    ├── test_logic.py        # 44 test cases cho logic game
-    └── test_minimax_lv2.py  # 41 test cases cho AI agent
+    ├── test_logic.py        
+    └── test_minimax_lv2.py  
 ```
