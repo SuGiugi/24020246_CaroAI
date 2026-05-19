@@ -82,3 +82,37 @@ class TestTestMoveAndUndo:
         self._init_board(ai, game)
         ai._test_move(4, 4)
         assert ai.player == 'O'
+
+    def test_undo_move_removes_piece(self, ai, game):
+        # _undo_move phải xoá quân khỏi ô đó
+        self._init_board(ai, game)
+        ai._test_move(4, 4)
+        ai._undo_move(4, 4)
+        assert ai.board[4][4] == '.'
+
+    def test_undo_move_restores_player(self, ai, game):
+        # _undo_move sẽ khôi phục lại lượt người chơi ban đầu
+        self._init_board(ai, game)
+        original = ai.player
+        ai._test_move(4, 4)
+        ai._undo_move(4, 4)
+        assert ai.player == original
+
+    def test_double_move_and_undo(self, ai, game):
+        # Hai nước đi liên tiếp và undo đúng thứ tự phải hoàn trả bàn về ban đầu
+        self._init_board(ai, game)
+        ai._test_move(3, 3)  # X đánh
+        ai._test_move(4, 4)  # O đánh
+        ai._undo_move(4, 4)  # hoàn tác O
+        ai._undo_move(3, 3)  # hoàn tác X
+        assert ai.board[3][3] == '.'
+        assert ai.board[4][4] == '.'
+        assert ai.player == 'X'
+
+    def test_test_move_o_player(self, ai, game):
+        # Khi lượt là O thì _test_move phải đặt 'O' vào ô
+        self._init_board(ai, game)
+        game.current_player = 'O'
+        ai.player = 'O'
+        ai._test_move(0, 0)
+        assert ai.board[0][0] == 'O'
