@@ -13,10 +13,10 @@ git clone https://github.com/your-repo/caro-ai.git
 cd caro-ai
 ```
 
-**Bước 2 — Cài thư viện kiểm thử** *(chỉ cần nếu muốn chạy test)*
+**Bước 2 — Cài thư viện cần thêm** *(chỉ cần nếu muốn chạy test)*
 
 ```bash
-pip install pytest
+pip install -r requirements.txt
 ```
 
 ---
