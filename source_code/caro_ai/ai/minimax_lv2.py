@@ -52,7 +52,7 @@ class agent:
                         elif count == 2 and close == 1:
                             point = 10
                         elif count == 2 and close == 0:
-                            point = 400
+                            point = 1000
 
 
                         if player == self.ai_player:
@@ -133,7 +133,7 @@ class agent:
         if game.check_win(x, y, self.board):
             return -(500000 + depth) if maximizing else 500000 + depth
         if depth == 0 or game.is_draw(self.board):
-            return self._evaluate(game.size)
+           return self._evaluate(game.size)
 
         moves = self._get_optimized_moves(game, self.board, use_optimization)
 

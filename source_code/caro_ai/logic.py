@@ -26,7 +26,6 @@ class Game_Caro:
             print("Invalid move. Try again.")
             return False
 
-    # Ki?m tra th?ng thua sau n??c ?i nh?t ??nh
     def check_win(self, x, y, board):
         directions = [(1, 0), (0, 1), (1, 1), (1, -1)]
         for dx, dy in directions:
