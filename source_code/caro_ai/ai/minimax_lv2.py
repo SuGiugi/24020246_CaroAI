@@ -52,7 +52,7 @@ class agent:
                         elif count == 2 and close == 1:
                             point = 10
                         elif count == 2 and close == 0:
-                            point = 1000
+                            point = 400
 
 
                         if player == self.ai_player:
