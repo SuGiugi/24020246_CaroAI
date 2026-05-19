@@ -116,3 +116,82 @@ class TestTestMoveAndUndo:
         ai.player = 'O'
         ai._test_move(0, 0)
         assert ai.board[0][0] == 'O'
+
+# _evaluate
+class TestEvaluate:
+    def _set_board(self, ai, game):
+        # Đồng bộ self.board của agent với bàn của game
+        ai.board = [row.copy() for row in game.board]
+
+    def test_empty_board_score_is_zero(self, ai, game):
+        # Bàn trống không có quân nào -> điểm phải = 0
+        self._set_board(ai, game)
+        assert ai._evaluate(9) == 0
+
+    def test_ai_advantage_positive_score(self, ai, game):
+        # AI có 2 quân liên tiếp không bị chặn -> điểm phải dương
+        game.board[4][4] = 'O'
+        game.board[4][5] = 'O'
+        self._set_board(ai, game)
+        assert ai._evaluate(9) > 0
+
+    def test_opponent_advantage_negative_score(self, ai, game):
+        # Đối thủ có 2 quân liên tiếp không bị chặn -> điểm phải âm
+        game.board[4][4] = 'X'
+        game.board[4][5] = 'X'
+        self._set_board(ai, game)
+        assert ai._evaluate(9) < 0
+
+    def test_three_ai_pieces_scores_higher_than_two(self, ai, game):
+        # 3 quân AI liên tiếp phải cho điểm cao hơn 2 quân
+        game.board[4][4] = 'O'
+        game.board[4][5] = 'O'
+        self._set_board(ai, game)
+        score_two = ai._evaluate(9)
+
+        game.board[4][6] = 'O'
+        self._set_board(ai, game)
+        score_three = ai._evaluate(9)
+
+        assert score_three > score_two
+
+    def test_blocked_run_scores_less_than_open_run(self, ai, game):
+        # Dãy bị chặn 1 đầu phải có điểm thấp hơn dãy mở cả 2 đầu
+        game.board[4][3] = 'O'
+        game.board[4][4] = 'O'
+        game.board[4][5] = 'O'
+        game.board[4][2] = 'X'
+        self._set_board(ai, game)
+        score_blocked = ai._evaluate(9)
+
+        game.board[4][2] = '.'
+        self._set_board(ai, game)
+        score_open = ai._evaluate(9)
+
+        assert score_open > score_blocked
+
+    def test_opponent_threat_weighted_heavily(self, ai, game):
+        # Đối thủ 3 quân mở cả 2 đầu phải bị phạt nặng hơn AI 3 quân cùng thế
+        game.board[2][2] = 'O'
+        game.board[2][3] = 'O'
+        game.board[2][4] = 'O'
+        self._set_board(ai, game)
+        score_ai_3 = ai._evaluate(9)
+
+        game.board[2][2] = 'X'
+        game.board[2][3] = 'X'
+        game.board[2][4] = 'X'
+        self._set_board(ai, game)
+        score_opp_3 = ai._evaluate(9)
+
+        assert score_ai_3 > 0
+        assert score_opp_3 < 0
+
+    def test_symmetric_position_ai_vs_x(self):
+        # AI đóng vai X: bố cục đối xứng phải cho điểm dương
+        a = agent(depth=2, ai_player='X')
+        g = Game_Caro(9)
+        g.board[4][4] = 'X'
+        g.board[4][5] = 'X'
+        a.board = [row.copy() for row in g.board]
+        assert a._evaluate(9) > 0
