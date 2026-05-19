@@ -70,16 +70,15 @@ ai = agent(depth=2)
 ## Cấu trúc thư mục
 
 ```
-caro-ai/
+24020279_24020246_23020595_CaroAI/
 ├── main_gui.py              
-├── gui.py                   
-├── benchmark_weights.py     
-├── pytest.ini               
+├── gui.py                                
 ├── caro_ai/
 │   ├── logic.py             
 │   └── ai/
 │       └── minimax_lv2.py   
 └── tests/
     ├── test_logic.py        
-    └── test_minimax_lv2.py  
+    └── test_minimax_lv2.py
+    └── __init__.py
 ```
