@@ -40,27 +40,22 @@ def _place(game, cells_x, cells_o):
 
 class TestInit:
     def test_depth_default(self):
-        # Độ sâu mặc định phải là 3
         a = agent()
         assert a.depth == 3
 
     def test_depth_custom(self):
-        # Độ sâu tuỳ chỉnh phải được lưu đúng
         a = agent(depth=5)
         assert a.depth == 5
 
     def test_ai_player_default(self):
-        # Người chơi AI mặc định là O
         a = agent()
         assert a.ai_player == 'O'
 
     def test_ai_player_custom(self):
-        # Có thể khởi tạo AI đóng vai X
         a = agent(ai_player='X')
         assert a.ai_player == 'X'
 
     def test_node_visited_starts_at_zero(self):
-        # Bộ đếm node bắt đầu từ 0
         a = agent()
         assert a.node_visted == 0
 
@@ -72,26 +67,22 @@ class TestTestMoveAndUndo:
         ai.player = game.current_player
 
     def test_test_move_places_current_player(self, ai, game):
-        # _test_move đặt ký hiệu của người chơi hiện tại vào ô
         self._init_board(ai, game)
         ai._test_move(4, 4)
         assert ai.board[4][4] == 'X'
 
     def test_test_move_switches_player(self, ai, game):
-        # Sau _test_move -> lượt chuyển sang người kia
         self._init_board(ai, game)
         ai._test_move(4, 4)
         assert ai.player == 'O'
 
     def test_undo_move_removes_piece(self, ai, game):
-        # _undo_move phải xoá quân khỏi ô đó
         self._init_board(ai, game)
         ai._test_move(4, 4)
         ai._undo_move(4, 4)
         assert ai.board[4][4] == '.'
 
     def test_undo_move_restores_player(self, ai, game):
-        # _undo_move sẽ khôi phục lại lượt người chơi ban đầu
         self._init_board(ai, game)
         original = ai.player
         ai._test_move(4, 4)
@@ -103,8 +94,8 @@ class TestTestMoveAndUndo:
         self._init_board(ai, game)
         ai._test_move(3, 3)  # X đánh
         ai._test_move(4, 4)  # O đánh
-        ai._undo_move(4, 4)  # hoàn tác O
-        ai._undo_move(3, 3)  # hoàn tác X
+        ai._undo_move(4, 4)  # undo O
+        ai._undo_move(3, 3)  # undo X
         assert ai.board[3][3] == '.'
         assert ai.board[4][4] == '.'
         assert ai.player == 'X'
@@ -195,3 +186,79 @@ class TestEvaluate:
         g.board[4][5] = 'X'
         a.board = [row.copy() for row in g.board]
         assert a._evaluate(9) > 0
+
+# test get_best_move
+class TestGetBestMove:
+    def test_returns_tuple_of_three(self, ai_shallow, game):
+        result = ai_shallow.get_best_move(game, mode='alphabeta')
+        assert len(result) == 3
+
+    def test_move_is_within_bounds(self, ai_shallow, game):
+        move, _, _ = ai_shallow.get_best_move(game, mode='alphabeta')
+        r, c = move
+        assert 0 <= r < 9 and 0 <= c < 9
+
+    def test_move_is_on_empty_cell(self, ai_shallow, game):
+        move, _, _ = ai_shallow.get_best_move(game, mode='alphabeta')
+        r, c = move
+        assert game.board[r][c] == '.'
+
+    def test_nodes_visited_positive(self, ai_shallow, game):
+        _, nodes, _ = ai_shallow.get_best_move(game, mode='alphabeta')
+        assert nodes > 0
+
+    def test_execution_time_positive(self, ai_shallow, game):
+        _, _, t = ai_shallow.get_best_move(game, mode='alphabeta')
+        assert t > 0
+
+    def test_node_count_resets_between_calls(self, ai_shallow, game):
+        _, nodes1, _ = ai_shallow.get_best_move(game, mode='alphabeta')
+        _, nodes2, _ = ai_shallow.get_best_move(game, mode='alphabeta')
+        assert nodes1 == nodes2
+
+    def test_ai_takes_winning_move(self, game):
+        # AI phải chọn nước thắng ngay khi có thể (O đã có 3 liên tiếp)
+        # X đang là lượt chơi, nhưng đặt lượt O để AI đi
+        _place(game,
+               cells_x=[(0, 8), (1, 8), (2, 8)],
+               cells_o=[(4, 0), (4, 1), (4, 2)])
+        game.current_player = 'O'
+        a = agent(depth=2, ai_player='O')
+        move, _, _ = a.get_best_move(game, mode='alphabeta')
+        # Nước thắng phải là (4,3) hoặc (4,4) -> hoàn thành dãy ngang
+        r, c = move
+        # Ít nhất phải đặt quân ở hàng 4 (tiếp tục dãy 3 quân liên tiếp)
+        assert r == 4 and c in [3, 4]
+
+    def test_ai_blocks_opponent_win(self, game):
+        # AI phải chặn ngay khi đối thủ sắp thắng (X đã có 3 liên tiếp)
+        _place(game,
+               cells_x=[(2, 2), (2, 3), (2, 4)],
+               cells_o=[(5, 5)])
+        game.current_player = 'O'
+        a = agent(depth=2, ai_player='O')
+        move, _, _ = a.get_best_move(game, mode='alphabeta')
+        r, c = move
+        # O phải chặn tại (2,1) hoặc (2,5) để ngăn X thắng
+        assert (r, c) in [(2, 1), (2, 5)]
+
+    def test_minimax_mode_returns_valid_move(self, ai_shallow, game):
+        move, nodes, t = ai_shallow.get_best_move(game, mode='minimax')
+        r, c = move
+        assert 0 <= r < 9 and 0 <= c < 9
+        assert game.board[r][c] == '.'
+        assert nodes > 0
+
+    def test_compare_mode_returns_tuple_of_three(self, ai_shallow, game):
+        game.board[4][4] = 'X'
+        game.current_player = 'O'
+        result = ai_shallow.get_best_move(game, mode='compare')
+        assert len(result) == 3
+
+    def test_compare_mode_move_is_valid(self, ai_shallow, game):
+        game.board[4][4] = 'X'
+        game.current_player = 'O'
+        move, _, _ = ai_shallow.get_best_move(game, mode='compare')
+        r, c = move
+        assert 0 <= r < 9 and 0 <= c < 9
+        assert game.board[r][c] == '.'
