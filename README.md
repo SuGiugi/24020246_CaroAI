@@ -29,6 +29,10 @@ python main_gui.py
 
 Giao diện đồ họa sẽ mở ra. Người chơi đóng vai **X** và đi trước, AI đóng vai **O**.
 
+Phần **AI MODE** có thể chọn giữa các thuật toán để chạy
+
+**Đối sánh** dùng để so sánh số node giữa 2 thuật toán và ghi log ra terminal
+
 ---
 
 ## Chạy kiểm thử
